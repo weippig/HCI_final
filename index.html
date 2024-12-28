@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>air-drawing</title>
+  <link rel="stylesheet" href="stylent.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+
+  <script src="js/scriptent.js"></script>
+  <script src="js/strokes.js"></script>
+</head>
+
+<body>
+  <div id="main">
+    <h1>air-drawing 👆</h1>
+    <video class="input_video"></video>
+
+    <div id="draw_area">
+      <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+      <div id="side"> 
+        <button id="clear_button" class="side_button" type="button"> Clear <br> Board </button>
+        <button id="dl_button" class="side_button" type="button"> Predict </button>
+
+      </div>
+    </div>
+    <input id="download_button" type="button" value="Download Point List">
+
+    <h2>Details</h2>
+    <ul>
+      <li><b>Your data are not collected</b>. This application is entirely client-side, nothing is sent to any servers.</li>
+      <li>This tool uses Deep Learning to help you draw and write with your hand and webcam.
+          A Deep Learning model is used to try to predict whether you want to have 'pencil up' or 'pencil down'.</li>
+      <li>The code is optimized to run on most machines, the bottleneck may be your webcam.
+          If your webcam is of low quality, you can try to improve the lighting of your face, this will trigger your webcam sensors faster,
+          and possibly increase shutter speed and framerate. </li>
+      <li>The hand detection will work poorly if part of your hand is outside of the frame.</li>
+      <li>When drawing, try to keep your hand in this position 👆.
+          Lowering your index finger is natural but it hinders the detection of the fingertip.</li>
+    </ul> 
+  </div>
+</body>
+</html>
