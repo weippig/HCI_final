@@ -31,6 +31,28 @@ button:active{
     grid-auto-rows: 100px;
 }
 
+#brush_size_block {
+    display: flex;
+    flex-direction: column; /* 垂直排列文字和按鈕 */
+    align-items: center; /* 讓內容水平居中 */
+    justify-content: center;
+    gap: 10px; /* 文字和按鈕之間的間距 */
+    padding: 10px;
+    border: solid 1px #ccc; /* 加上邊框，讓它成為區塊 */
+    border-radius: 8px; /* 圓角邊框 */
+    background-color: #f9f9f9; /* 背景顏色 */
+  }
+  
+  #brush_size_label {
+    font-size: 18px;
+    font-family: monospace;
+  }
+  
+  #brush_size_controls {
+    display: flex;
+    gap: 10px; /* 控制按鈕間距 */
+  }
+
 canvas {
     flex: none;
     border: solid 1px;
