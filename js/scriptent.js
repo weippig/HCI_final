@@ -63,6 +63,8 @@ class Point {
 function init() {
     const download_button = document.querySelector('#download_button')
     const clear_button = document.querySelector('#clear_button')
+    const increase_brush_size_button = document.querySelector('#increase_brush_size')
+    const decrease_brush_size_button = document.querySelector('#decrease_brush_size')
     const dl_button = document.querySelector('#dl_button')
     const video = document.querySelector('video');
     const canvas = document.querySelector('canvas');
@@ -83,6 +85,9 @@ function init() {
     download_button.onclick = () => download_points(stroke_list);
     clear_button.onclick = () => stroke_list.clear();
     dl_button.onclick = () => stroke_list.predict();
+    // 按鈕點擊事件來調整筆劃大小
+    increase_brush_size_button.onclick = () => stroke_list.increaseBrushSize();
+    decrease_brush_size_button.onclick = () => stroke_list.decreaseBrushSize();
 
     async function process() {
         context.save();

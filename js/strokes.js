@@ -1,10 +1,26 @@
 class StrokeList {
     constructor() {
         this.stroke_list = [[]];
+        this.brushSize = 5;  // 初始筆劃大小
+    }
+
+    // 增加筆劃大小
+    increaseBrushSize() {
+        this.brushSize += 5;
+        console.log('Brush Size:', this.brushSize);
+    }
+
+    // 減少筆劃大小
+    decreaseBrushSize() {
+        if (this.brushSize > 5) {
+            this.brushSize -= 5;
+            console.log('Brush Size:', this.brushSize);
+        }
     }
 
     add_pt (pt) {
-        this.stroke_list.at(-1).push(pt)
+        const pointWithSize = { ...pt, size: this.brushSize };
+        this.stroke_list.at(-1).push(pointWithSize);
     }
 
     clear () {
@@ -12,7 +28,28 @@ class StrokeList {
     }
 
     erase (erase_pos,radius) {
-        this.filter((index,pt) => (Point.distance(erase_pos,pt) > radius))
+        const new_strokes = [];
+
+        this.stroke_list.forEach(stroke => {
+            let current_segment = [];
+            stroke.forEach(pt => {
+                if (Point.distance(erase_pos, pt) > radius + (pt.size || 0) / 2) {
+                    // 保留未被擦除的點
+                    current_segment.push(pt);
+                } else if (current_segment.length > 0) {
+                    // 如果當前段落結束，將其存入新筆劃列表
+                    new_strokes.push(current_segment);
+                    current_segment = [];
+                }
+            });
+            // 最後處理段落
+            if (current_segment.length > 0) {
+                new_strokes.push(current_segment);
+            }
+        });
+    
+        // 更新 stroke_list 並移除空筆劃
+        this.stroke_list = new_strokes.filter(stroke => stroke.length > 0);
     }
 
     new_stroke () {
@@ -26,12 +63,15 @@ class StrokeList {
         context.strokeStyle = "magenta";
         context.shadowColor = "magenta";
         context.shadowBlur = 10;
-        context.lineWidth = 5;
+        
         for (const stroke of this.stroke_list) {
             if (stroke.length) {
                 context.beginPath();
+                context.lineWidth = stroke[0].size; // 使用第一點的筆劃粗細
                 context.moveTo(stroke[0].x, stroke[0].y);
-                for (const pt of stroke.slice(1)) {
+                for (let i = 1; i < stroke.length; i++) {
+                    const pt = stroke[i];
+                    context.lineWidth = pt.size; // 更新筆劃粗細
                     context.lineTo(pt.x, pt.y);
                 }
                 context.stroke();
