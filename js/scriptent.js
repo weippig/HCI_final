@@ -27,17 +27,150 @@ const finger_state = {
     index: false,
     middle: false,
     ring: false,
-    little: false
+    little: false,
+    isFist: false
 }
+
+/**
+ * 將 canvas 畫布保存為 PNG 圖片
+ * @param {HTMLCanvasElement} canvas - 要保存的畫布元素
+ */
+function saveCanvasAsImage(canvas) {
+    const fist_icon = new Image();
+    fist_icon.src = 'assets/fist.png';
+    try {
+        const context = canvas.getContext('2d');
+        
+        // 在右下角繪製拳頭標示
+        const iconSize = 50; // 圖示尺寸
+        context.drawImage(
+            fist_icon,
+            canvas.width - iconSize - 10, // X 位置（右下角留 10px 邊距）
+            canvas.height - iconSize - 10, // Y 位置（右下角留 10px 邊距）
+            iconSize, // 寬度
+            iconSize  // 高度
+        );
+
+        // 將畫布轉換為圖片數據 URL (PNG 格式)
+        const image = canvas.toDataURL('image/png');
+
+        // 創建一個臨時的超連結元素
+        const a = document.createElement('a');
+        a.href = image;
+        a.download = `drawing_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
+
+        // 觸發下載
+        a.click();
+
+        console.log('🎉 圖片已成功保存！');
+    } catch (error) {
+        console.error('❌ 保存圖片時發生錯誤:', error);
+    }
+}
+
+/**
+ * 計算兩個向量之間的角度
+ * @param {Array} v1 - 向量1 [x, y]
+ * @param {Array} v2 - 向量2 [x, y]
+ * @returns {number} - 角度（度數）
+ */
+function vector2DAngle(v1, v2) {
+    const dotProduct = v1[0] * v2[0] + v1[1] * v2[1];
+    const magnitude1 = Math.sqrt(v1[0] ** 2 + v1[1] ** 2);
+    const magnitude2 = Math.sqrt(v2[0] ** 2 + v2[1] ** 2);
+    const angle = Math.acos(dotProduct / (magnitude1 * magnitude2));
+    return (angle * 180) / Math.PI; // 將弧度轉換為度數
+}
+
+/**
+ * 根據手部關鍵點計算每根手指的角度
+ * @param {Array} landmarks - 手部關鍵點座標
+ * @returns {Array} - 每根手指的角度列表
+ */
+function calculateFingerAngles(landmarks) {
+    const angles = [];
+
+    // 大拇指
+    let v1 = [
+        landmarks[fingers.thumb2].x - landmarks[fingers.thumb1].x,
+        landmarks[fingers.thumb2].y - landmarks[fingers.thumb1].y,
+    ];
+    let v2 = [
+        landmarks[fingers.thumb3].x - landmarks[fingers.thumb2].x,
+        landmarks[fingers.thumb3].y - landmarks[fingers.thumb2].y,
+    ];
+    angles.push(vector2DAngle(v1, v2));
+
+    // 食指
+    v1 = [
+        landmarks[fingers.index2].x - landmarks[fingers.index1].x,
+        landmarks[fingers.index2].y - landmarks[fingers.index1].y,
+    ];
+    v2 = [
+        landmarks[fingers.index3].x - landmarks[fingers.index2].x,
+        landmarks[fingers.index3].y - landmarks[fingers.index2].y,
+    ];
+    angles.push(vector2DAngle(v1, v2));
+
+    // 中指
+    v1 = [
+        landmarks[fingers.middle2].x - landmarks[fingers.middle1].x,
+        landmarks[fingers.middle2].y - landmarks[fingers.middle1].y,
+    ];
+    v2 = [
+        landmarks[fingers.middle3].x - landmarks[fingers.middle2].x,
+        landmarks[fingers.middle3].y - landmarks[fingers.middle2].y,
+    ];
+    angles.push(vector2DAngle(v1, v2));
+
+    // 無名指
+    v1 = [
+        landmarks[fingers.ring2].x - landmarks[fingers.ring1].x,
+        landmarks[fingers.ring2].y - landmarks[fingers.ring1].y,
+    ];
+    v2 = [
+        landmarks[fingers.ring3].x - landmarks[fingers.ring2].x,
+        landmarks[fingers.ring3].y - landmarks[fingers.ring2].y,
+    ];
+    angles.push(vector2DAngle(v1, v2));
+
+    // 小拇指
+    v1 = [
+        landmarks[fingers.little2].x - landmarks[fingers.little1].x,
+        landmarks[fingers.little2].y - landmarks[fingers.little1].y,
+    ];
+    v2 = [
+        landmarks[fingers.little3].x - landmarks[fingers.little2].x,
+        landmarks[fingers.little3].y - landmarks[fingers.little2].y,
+    ];
+    angles.push(vector2DAngle(v1, v2));
+
+    return angles;
+}
+
+/**
+ * 判斷是否為握拳手勢
+ * @param {Array} angles - 每根手指的角度列表
+ * @param {number} threshold - 判斷手指彎曲的角度閾值（默認為 50 度）
+ * @returns {boolean} - 如果是握拳手勢，返回 true，否則返回 false
+ */
+function isFist(angles, threshold = 50) {
+    return angles.every(angle => angle >= threshold);
+}
+
 
 function gesture() {
     /*
         0 : nothing
         1 : index up, drawing state
         2 : index and middle up, eraser state
+        3 : fist, save image
     */
     if (finger_state.index && !finger_state.middle && !finger_state.ring && !finger_state.little) {return 1;}
     if (finger_state.index && finger_state.middle && !finger_state.ring && !finger_state.little) {return 2;}
+    if (finger_state.isFist) {
+        return 3; // 保存圖片模式（握拳）
+    }
     return 0;
 }
 
@@ -77,8 +210,12 @@ function init() {
 
     const draw_icon = new Image();
     const erase_icon = new Image();
+    const save_icon = new Image();
+    const fist_icon = new Image();
     draw_icon.src = 'assets/draw.png';
     erase_icon.src = 'assets/erase.png';
+    save_icon.src = 'assets/save.png';
+    fist_icon.src = 'assets/fist.png';
 
     let stroke_list = new StrokeList();
     let previous_pt = null;
@@ -88,6 +225,8 @@ function init() {
     // 按鈕點擊事件來調整筆劃大小
     increase_brush_size_button.onclick = () => stroke_list.increaseBrushSize();
     decrease_brush_size_button.onclick = () => stroke_list.decreaseBrushSize();
+
+    let saveCooldown = false;
 
     async function process() {
         context.save();
@@ -141,6 +280,26 @@ function init() {
             context.globalAlpha = 0.2;
             context.drawImage(erase_icon,width-166,height-200);
         }
+
+        // 📸 **保存圖片模式（握拳）**
+        if (gest == 3 && !saveCooldown) {
+            saveCooldown = true;
+            console.log('🖐️ 偵測到握拳，正在保存圖片...');
+            context.globalAlpha = 1;
+
+            context.drawImage(save_icon, width - 106, height - 300, 50, 50);
+            context.drawImage(fist_icon, width - 156, height - 300, 50, 50);
+            saveCanvasAsImage(canvas);
+
+            setTimeout(() => {
+                saveCooldown = false;
+            }, 2000); // 2 秒冷卻時間
+        } else {
+            context.globalAlpha = 0.2;
+            context.drawImage(save_icon, width-106,height-300, 50, 50);
+            context.drawImage(fist_icon, width-156,height-300, 50, 50);
+        }
+
         context.restore();
 
         context.save();
@@ -160,6 +319,8 @@ function init() {
                 finger_state.middle = landmarks[fingers.middle1].y < landmarks[fingers.middle3].y;
                 finger_state.ring = landmarks[fingers.ring1].y < landmarks[fingers.ring3].y;
                 finger_state.little = landmarks[fingers.little1].y < landmarks[fingers.little3].y;
+                const angles = calculateFingerAngles(landmarks);
+                finger_state.isFist = isFist(angles);
             }
         }
     }
