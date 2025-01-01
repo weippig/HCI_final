@@ -32,18 +32,44 @@ const finger_state = {
 }
 
 /**
- * 將 canvas 畫布保存為 PNG 圖片
- * @param {HTMLCanvasElement} canvas - 要保存的畫布元素
+ * 將 canvas 畫布保存為 PNG 圖片，並保存筆劃記錄與拳頭標示
+ * @param {HTMLCanvasElement} canvas - 畫布元素
+ * @param {StrokeList} stroke_list - 筆劃記錄
  */
-function saveCanvasAsImage(canvas) {
+function saveCanvasAsImage(canvas, stroke_list) {
     const fist_icon = new Image();
     fist_icon.src = 'assets/fist.png';
+
     try {
-        const context = canvas.getContext('2d');
-        
-        // 在右下角繪製拳頭標示
-        const iconSize = 50; // 圖示尺寸
-        context.drawImage(
+        // 創建一個臨時畫布來重繪所有筆劃和標示
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempContext = tempCanvas.getContext('2d');
+
+        // 1. 將原始畫布內容繪製到臨時畫布
+        tempContext.drawImage(canvas, 0, 0);
+
+        // 2. 將筆劃記錄重新繪製到臨時畫布上
+        tempContext.lineJoin = "round";
+        tempContext.strokeStyle = "magenta";
+        tempContext.shadowColor = "magenta";
+        tempContext.shadowBlur = 10;
+        tempContext.lineWidth = 5;
+        for (const stroke of stroke_list.stroke_list) {
+            if (stroke.length) {
+                tempContext.beginPath();
+                tempContext.moveTo(stroke[0].x, stroke[0].y);
+                for (const pt of stroke.slice(1)) {
+                    tempContext.lineTo(pt.x, pt.y);
+                }
+                tempContext.stroke();
+            }
+        }
+
+        // 3. 在右下角添加拳頭標示
+        const iconSize = 50; // 圖示大小
+        tempContext.drawImage(
             fist_icon,
             canvas.width - iconSize - 10, // X 位置（右下角留 10px 邊距）
             canvas.height - iconSize - 10, // Y 位置（右下角留 10px 邊距）
@@ -51,22 +77,21 @@ function saveCanvasAsImage(canvas) {
             iconSize  // 高度
         );
 
-        // 將畫布轉換為圖片數據 URL (PNG 格式)
-        const image = canvas.toDataURL('image/png');
+        // 4. 將畫布轉換為圖片數據 URL (PNG 格式)
+        const image = tempCanvas.toDataURL('image/png');
 
-        // 創建一個臨時的超連結元素
+        // 5. 創建一個臨時的超連結元素並下載
         const a = document.createElement('a');
         a.href = image;
         a.download = `drawing_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
-
-        // 觸發下載
         a.click();
 
-        console.log('🎉 圖片已成功保存！');
+        console.log('🎉 圖片已成功保存，包含筆劃記錄與拳頭標示！');
     } catch (error) {
         console.error('❌ 保存圖片時發生錯誤:', error);
     }
 }
+
 
 /**
  * 計算兩個向量之間的角度
@@ -289,7 +314,7 @@ function init() {
 
             context.drawImage(save_icon, width - 106, height - 300, 50, 50);
             context.drawImage(fist_icon, width - 156, height - 300, 50, 50);
-            saveCanvasAsImage(canvas);
+            saveCanvasAsImage(canvas, stroke_list);
 
             setTimeout(() => {
                 saveCooldown = false;
