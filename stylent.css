@@ -84,3 +84,51 @@ ul {
     margin: 2%;
     display: none;
 }
+
+#colorButton {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.palette {
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1000;
+    flex-wrap: wrap; /* 允許換行 */
+    gap: 10px; /* 顏色方塊之間的間距 */
+    max-width: 250px; /* 每行6個顏色 (6 * 40px + 5 * 10px = 280px) */
+}
+
+.hidden {
+    display: none;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid #ddd;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-circle {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background-color: transparent;
+    vertical-align: middle;
+}

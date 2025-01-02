@@ -22,6 +22,7 @@
 
     <div id="draw_area">
       <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+      
       <div id="side"> 
         <button id="clear_button" class="side_button" type="button"> Clear <br> Board </button>
         <!-- <div id="brush_size_controls">
@@ -31,7 +32,48 @@
         </div> -->
         <button id="increase_brush_size" class="side_button" type="button">Increase <br> Brush Size</button>
         <button id="decrease_brush_size" class="side_button" type="button">Decrease <br> Brush Size</button>
-        <button d="brush_color_controls" class="side_button" type="button"> Crush <br> Color </button>
+        <button id="colorButton" class="side_button" type="button"> Brush Color <span id="colorIndicator" class="color-circle"></span></button>
+        <div id="colorPalette" class="palette hidden">
+          <!-- 紅色系 -->
+          <div class="color-option" style="background: #FF0000;"></div>
+          <div class="color-option" style="background: #FF5733;"></div>
+          <div class="color-option" style="background: #E63946;"></div>
+          <div class="color-option" style="background: #C70039;"></div>
+          <div class="color-option" style="background: #900C3F;"></div>
+          <div class="color-option" style="background: #FFC1C1;"></div>
+
+          <!-- 橙色系 -->
+          <div class="color-option" style="background: #FFA500;"></div>
+          <div class="color-option" style="background: #FF8C00;"></div>
+          <div class="color-option" style="background: #FF7043;"></div>
+          <div class="color-option" style="background: #FF6F61;"></div>
+          <div class="color-option" style="background: #E64A19;"></div>
+          <div class="color-option" style="background: #FFDAB9;"></div>
+
+          <!-- 黃色系 -->
+          <div class="color-option" style="background: #FFFF00;"></div>
+          <div class="color-option" style="background: #FFD700;"></div>
+          <div class="color-option" style="background: #F1C40F;"></div>
+          <div class="color-option" style="background: #F39C12;"></div>
+          <div class="color-option" style="background: #E67E22;"></div>
+          <div class="color-option" style="background: #FFFACD;"></div>
+
+          <!-- 綠色系 -->
+          <div class="color-option" style="background: #00FF00;"></div>
+          <div class="color-option" style="background: #32CD32;"></div>
+          <div class="color-option" style="background: #2ECC71;"></div>
+          <div class="color-option" style="background: #27AE60;"></div>
+          <div class="color-option" style="background: #1E8449;"></div>
+          <div class="color-option" style="background: #D4EDDA;"></div>
+
+          <!-- 藍色系 -->
+          <div class="color-option" style="background: #0000FF;"></div>
+          <div class="color-option" style="background: #1E90FF;"></div>
+          <div class="color-option" style="background: #3498DB;"></div>
+          <div class="color-option" style="background: #2980B9;"></div>
+          <div class="color-option" style="background: #154360;"></div>
+          <div class="color-option" style="background: #D6EAF8;"></div>
+      </div>
         <button id="dl_button" class="side_button" type="button"> Predict </button>
       </div>
     </div>

@@ -207,6 +207,8 @@ function download_points(stroke_list) {
     a.click();
 }
 
+
+
 class Point {
     constructor(x,y) {
         this.x = x;
@@ -227,6 +229,29 @@ function init() {
     const video = document.querySelector('video');
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');
+
+    const colorButton = document.getElementById('colorButton');
+    const colorPalette = document.getElementById('colorPalette');
+    const colorOptions = document.querySelectorAll('.color-option');
+
+    // 顯示/隱藏調色盤
+    colorButton.addEventListener('click', () => {
+        colorPalette.classList.toggle('hidden');
+    });
+
+    // 點擊調色盤中的顏色選項
+    colorOptions.forEach(option => {
+        option.addEventListener('click', (event) => {
+            const selectedColor = event.target.style.backgroundColor;
+            colorIndicator.style.backgroundColor = selectedColor; // 更新小圓圈顏色
+            console.log('選擇的顏色:', selectedColor);
+            colorPalette.classList.add('hidden'); // 選擇完畢後隱藏調色盤
+
+            stroke_list.changeBrushColor(selectedColor)
+        });
+    });
+
+
 
     const width = canvas.width;
     const height = canvas.height;
