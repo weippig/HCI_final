@@ -28,7 +28,8 @@ const finger_state = {
     middle: false,
     ring: false,
     little: false,
-    isFist: false
+    isFist: false,
+    isOpenHand: false // 新增狀態：五指張開
 }
 
 /**
@@ -196,6 +197,8 @@ function gesture() {
     if (finger_state.isFist) {
         return 3; // 保存圖片模式（握拳）
     }
+
+    if (finger_state.isOpenHand) {return 4;} // 暫停繪圖模式（五指張開）
     return 0;
 }
 
@@ -350,6 +353,15 @@ function init() {
             context.drawImage(fist_icon, width-156,height-300, 50, 50);
         }
 
+        if (gest == 4) {
+            context.globalAlpha = 1;
+            context.fillStyle = 'rgba(255, 255, 0, 0.7)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.font = '48px Arial';
+            context.fillStyle = 'black';
+            context.fillText('⏸️ 暫停繪圖', canvas.width / 2 - 100, canvas.height / 2);
+        }
+
         context.restore();
 
         context.save();
@@ -371,6 +383,7 @@ function init() {
                 finger_state.little = landmarks[fingers.little1].y < landmarks[fingers.little3].y;
                 const angles = calculateFingerAngles(landmarks);
                 finger_state.isFist = isFist(angles);
+                finger_state.isOpenHand = finger_state.index && finger_state.middle && finger_state.ring && finger_state.little && finger_state.thumb;
             }
         }
     }

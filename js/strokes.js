@@ -67,14 +67,13 @@ class StrokeList {
     draw (context) {
         context.lineJoin = "round";
         context.strokeStyle = "magenta"; // 顏色
-        context.shadowColor = "magenta";
+        // context.shadowColor = "magenta";
         context.shadowBlur = 10;
         
         for (const stroke of this.stroke_list) {
             if (stroke.length) {
                 context.beginPath();
                 context.fillStyle = stroke[0].color;
-                //console.log(stroke[0].color)
                 context.lineWidth = stroke[0].size; // 使用第一點的筆劃粗細
                 context.strokeStyle = stroke[0].color;
                 context.moveTo(stroke[0].x, stroke[0].y);
