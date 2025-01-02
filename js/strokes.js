@@ -2,6 +2,7 @@ class StrokeList {
     constructor() {
         this.stroke_list = [[]];
         this.brushSize = 5;  // 初始筆劃大小
+        this.color = '#FF0000';
     }
 
     // 增加筆劃大小
@@ -18,8 +19,13 @@ class StrokeList {
         }
     }
 
+    changeBrushColor(color) {
+        this.color = color
+        console.log("change!", this.color)
+    }
+
     add_pt (pt) {
-        const pointWithSize = { ...pt, size: this.brushSize };
+        const pointWithSize = { ...pt, size: this.brushSize, color:this.color };
         this.stroke_list.at(-1).push(pointWithSize);
     }
 
@@ -60,14 +66,17 @@ class StrokeList {
 
     draw (context) {
         context.lineJoin = "round";
-        context.strokeStyle = "magenta";
+        context.strokeStyle = "magenta"; // 顏色
         context.shadowColor = "magenta";
         context.shadowBlur = 10;
         
         for (const stroke of this.stroke_list) {
             if (stroke.length) {
                 context.beginPath();
+                context.fillStyle = stroke[0].color;
+                //console.log(stroke[0].color)
                 context.lineWidth = stroke[0].size; // 使用第一點的筆劃粗細
+                context.strokeStyle = stroke[0].color;
                 context.moveTo(stroke[0].x, stroke[0].y);
                 for (let i = 1; i < stroke.length; i++) {
                     const pt = stroke[i];
