@@ -129,6 +129,6 @@ ul {
     display: inline-block;
     border-radius: 50%;
     border: 1px solid #ccc;
-    background-color: transparent;
+    background-color: #FF0000;
     vertical-align: middle;
 }
