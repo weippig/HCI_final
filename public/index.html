@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC Video Chat</title>
+  <style>
+    video {
+      width: 45%;
+      border: 1px solid black;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>雙人視訊聊天</h2>
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay></video>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    let localStream;
+    let peerConnection;
+
+    // ICE 配置（局域網內可省略）
+    const config = {
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
+
+    // 1. 獲取本地視訊流
+    async function startStream() {
+      console.log('start!')
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localVideo.srcObject = localStream;
+      socket.emit('ready');
+    }
+
+    // 2. 建立 P2P 連接
+    function createPeerConnection() {
+      peerConnection = new RTCPeerConnection(config);
+
+      // 加入本地流
+      localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+      };
+
+      // 傳送 ICE 候選者
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit('ice-candidate', event.candidate);
+        }
+      };
+    }
+
+    // 3. Socket.IO 訊號交換
+    socket.on('offer', async (offer) => {
+      createPeerConnection();
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      socket.emit('answer', answer);
+    });
+
+    socket.on('answer', async (answer) => {
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    });
+
+    socket.on('ice-candidate', async (candidate) => {
+      try {
+        await peerConnection.addIceCandidate(candidate);
+      } catch (e) {
+        console.error('Error adding received ice candidate', e);
+      }
+    });
+
+    // 初始化
+    async function init() {
+      await startStream();
+      createPeerConnection();
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      socket.emit('offer', offer);
+    }
+
+    init();
+  </script>
+</body>
+</html>
