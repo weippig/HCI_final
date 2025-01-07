@@ -320,9 +320,8 @@ class Point {
                 // 根據原始畫面大小調整背景圖片大小
                 bgCanvas.width = canvas.width;
                 bgCanvas.height = canvas.height;
-                
+    
                 ctx.drawImage(bg_image, 0, 0, canvas.width, canvas.height); 
-                
                 context.drawImage(bgCanvas, 0, 0, canvas.width, canvas.height);
             }
              
