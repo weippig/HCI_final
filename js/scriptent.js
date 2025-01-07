@@ -196,6 +196,8 @@ function gesture() {
     if (finger_state.isFist) {
         return 3; // 保存圖片模式（握拳）
     }
+    if (finger_state.index && finger_state.middle && finger_state.ring && !finger_state.little) {return 4;}
+
     return 0;
 }
 
@@ -220,7 +222,7 @@ class Point {
     }
 }
 
-function init() {
+ function init() {
     const download_button = document.querySelector('#download_button')
     const clear_button = document.querySelector('#clear_button')
     const increase_brush_size_button = document.querySelector('#increase_brush_size')
@@ -251,7 +253,13 @@ function init() {
         });
     });
 
+    let bg_index = 0;  // 當前背景索引
+    const backgrounds = [
+        video,
+        new Image()   // 背景 1
+    ];
 
+    backgrounds[1].src = 'assets/background1.jpg';
 
     const width = canvas.width;
     const height = canvas.height;
@@ -277,21 +285,57 @@ function init() {
     decrease_brush_size_button.onclick = () => stroke_list.decreaseBrushSize();
 
     let saveCooldown = false;
+    let backgroundChangeCooldown = false; // 冷卻標誌
+
 
     async function process() {
         context.save();
 
         // draw video stream
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        let gest = gesture();
+        
+        // 根據手勢判斷背景
+        if (gest == 4 && !backgroundChangeCooldown) {  // 偵測到背景切換手勢
+            bg_index = (bg_index + 1) % backgrounds.length; // 循環切換背景
+            console.log('切換背景:', bg_index);
+
+            backgroundChangeCooldown = true; // 啟用冷卻
+            setTimeout(() => { 
+                backgroundChangeCooldown = false; 
+                console.log('冷卻結束');
+            }, 3000); // 冷卻時間 3 秒
+        }
+
+        let output_frame = video;  // 默認顯示原始畫面
+
+        if (bg_index > 0 && backgrounds[bg_index]) {  // 如果有背景，顯示背景圖片
+            let bg_image = backgrounds[bg_index];
+            // 確保背景圖片已加載完成
+            if (bg_image.complete) {
+                // 創建一個畫布來調整背景圖片的大小
+                let bgCanvas = document.createElement("canvas");
+                let ctx = bgCanvas.getContext("2d");
+                
+                // 根據原始畫面大小調整背景圖片大小
+                bgCanvas.width = canvas.width;
+                bgCanvas.height = canvas.height;
+                
+                ctx.drawImage(bg_image, 0, 0, canvas.width, canvas.height); 
+                
+                context.drawImage(bgCanvas, 0, 0, canvas.width, canvas.height);
+            }
+             
+        }else{
+                context.drawImage(output_frame, 0, 0, canvas.width, canvas.height);
+        }
+        
 
         // draw hands
         await hands.send({image: video});
 
-        let gest = gesture();
-
         // draw icons
-        
+
         if (gest == 1) {
             // the user is drawing
             context.globalAlpha = 1;
