@@ -9,13 +9,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
 
    <!-- Load TensorFlow.js -->
    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
    <!-- Load BodyPix -->
    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
-</script>
 
   <script src="js/scriptent.js"></script>
   <script src="js/strokes.js"></script>
@@ -23,7 +21,7 @@
 
 <body>
   <div id="main">
-    <h1>air-drawing 👆</h1>
+    <h1>FLOWDRAW 🌈</h1>
     <video class="input_video"></video>
 
     <div id="draw_area">
@@ -31,11 +29,6 @@
       
       <div id="side"> 
         <button id="clear_button" class="side_button" type="button"> Clear <br> Board </button>
-        <!-- <div id="brush_size_controls">
-          <span id="brush_size_label">Asjust Brush Size</span>
-          <button id="increase_brush_size" class="side_button" type="button">+</button>
-          <button id="decrease_brush_size" class="side_button" type="button">_</button>
-        </div> -->
         <button id="increase_brush_size" class="side_button" type="button">Increase <br> Brush Size</button>
         <button id="decrease_brush_size" class="side_button" type="button">Decrease <br> Brush Size</button>
         <button id="colorButton" class="side_button" type="button"> Brush Color <span id="colorIndicator" class="color-circle"></span></button>
@@ -80,23 +73,22 @@
           <div class="color-option" style="background: #154360;"></div>
           <div class="color-option" style="background: #D6EAF8;"></div>
       </div>
-        <button id="dl_button" class="side_button" type="button"> Predict </button>
+        <button id="dl_button" class="side_button" type="button"> Details </button>
       </div>
+
+      <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close_button" onclick="closeModal()">&times;</span>
+            <ul>
+              <li>此程式完全運行在客戶端，不會收集使用者任何資訊</li>
+              <li>如果手未完整地出現在螢幕中，手部偵測效果會很差。</li>
+              <li>在繪畫時避免彎曲手指，否則可能影響手部偵測結果</li>
+            </ul> 
+        </div>
+    </div>
     </div>
     <input id="download_button" type="button" value="Download Point List">
 
-    <h2>Details</h2>
-    <ul>
-      <li><b>Your data are not collected</b>. This application is entirely client-side, nothing is sent to any servers.</li>
-      <li>This tool uses Deep Learning to help you draw and write with your hand and webcam.
-          A Deep Learning model is used to try to predict whether you want to have 'pencil up' or 'pencil down'.</li>
-      <li>The code is optimized to run on most machines, the bottleneck may be your webcam.
-          If your webcam is of low quality, you can try to improve the lighting of your face, this will trigger your webcam sensors faster,
-          and possibly increase shutter speed and framerate. </li>
-      <li>The hand detection will work poorly if part of your hand is outside of the frame.</li>
-      <li>When drawing, try to keep your hand in this position 👆.
-          Lowering your index finger is natural but it hinders the detection of the fingertip.</li>
-    </ul> 
   </div>
 </body>
 </html>

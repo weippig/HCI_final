@@ -245,9 +245,8 @@ class Point {
     colorOptions.forEach(option => {
         option.addEventListener('click', (event) => {
             const selectedColor = event.target.style.backgroundColor;
-            colorIndicator.style.backgroundColor = selectedColor; // 更新小圓圈顏色
-            console.log('選擇的顏色:', selectedColor);
-            colorPalette.classList.add('hidden'); // 選擇完畢後隱藏調色盤
+            colorIndicator.style.backgroundColor = selectedColor; 
+            colorPalette.classList.add('hidden'); 
 
             stroke_list.changeBrushColor(selectedColor)
         });
@@ -279,7 +278,8 @@ class Point {
     let previous_pt = null;
     download_button.onclick = () => download_points(stroke_list);
     clear_button.onclick = () => stroke_list.clear();
-    dl_button.onclick = () => stroke_list.predict();
+    dl_button.onclick = () => show_modal();
+    close_button.onclick = () => close_modal();
     // 按鈕點擊事件來調整筆劃大小
     increase_brush_size_button.onclick = () => stroke_list.increaseBrushSize();
     decrease_brush_size_button.onclick = () => stroke_list.decreaseBrushSize();
@@ -287,6 +287,22 @@ class Point {
     let saveCooldown = false;
     let backgroundChangeCooldown = false; // 冷卻標誌
 
+
+    function show_modal() {
+        document.getElementById('myModal').style.display = "block";
+    }
+
+    // 關閉模態框
+    function close_modal() {
+        document.getElementById('myModal').style.display = "none";
+    }
+
+    // 點擊模態框外的區域關閉模態框
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('myModal')) {
+            close_modal();
+        }
+    }
 
     async function process() {
         context.save();
@@ -381,8 +397,8 @@ class Point {
             console.log('🖐️ 偵測到握拳，正在保存圖片...');
             context.globalAlpha = 1;
 
-            context.drawImage(save_icon, width - 106, height - 300, 50, 50);
-            context.drawImage(fist_icon, width - 156, height - 300, 50, 50);
+            // context.drawImage(save_icon, width - 106, height - 300, 100, 100);
+            // context.drawImage(fist_icon, width - 156, height - 300, 100, 100);
             saveCanvasAsImage(canvas, stroke_list);
 
             setTimeout(() => {
@@ -390,8 +406,8 @@ class Point {
             }, 2000); // 2 秒冷卻時間
         } else {
             context.globalAlpha = 0.2;
-            context.drawImage(save_icon, width-106,height-300, 50, 50);
-            context.drawImage(fist_icon, width-156,height-300, 50, 50);
+            // context.drawImage(save_icon, width-106,height-300, 100, 100);
+            // context.drawImage(fist_icon, width-156,height-300, 100, 100);
         }
 
         context.restore();
