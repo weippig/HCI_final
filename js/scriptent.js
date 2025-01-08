@@ -32,7 +32,7 @@ const finger_state = {
 }
 
 /**
- * 將 canvas 畫布保存為 PNG 圖片，並保存筆劃記錄與拳頭標示
+ * 將 canvas 畫布保存為 PNG 圖片，並保存筆劃記錄、筆劃大小與顏色
  * @param {HTMLCanvasElement} canvas - 畫布元素
  * @param {StrokeList} stroke_list - 筆劃記錄
  */
@@ -47,19 +47,21 @@ function saveCanvasAsImage(canvas, stroke_list) {
         tempCanvas.height = canvas.height;
         const tempContext = tempCanvas.getContext('2d');
 
-        // 1. 將原始畫布內容繪製到臨時畫布
+        // 將原始畫布內容繪製到臨時畫布
         tempContext.drawImage(canvas, 0, 0);
 
-        // 2. 將筆劃記錄重新繪製到臨時畫布上
-        tempContext.lineJoin = "round";
-        tempContext.strokeStyle = "magenta";
-        tempContext.shadowColor = "magenta";
-        tempContext.shadowBlur = 10;
-        tempContext.lineWidth = 5;
+        // 將筆劃記錄重新繪製到臨時畫布上，包含筆劃大小和顏色
         for (const stroke of stroke_list.stroke_list) {
             if (stroke.length) {
                 tempContext.beginPath();
                 tempContext.moveTo(stroke[0].x, stroke[0].y);
+                
+                // 設定每個筆劃的顏色與大小
+                tempContext.strokeStyle = stroke[0].color || 'magenta';
+                // tempContext.shadowColor = stroke[0].color || 'magenta';
+                tempContext.shadowBlur = 10;
+                tempContext.lineWidth = stroke[0].size || 5;
+                
                 for (const pt of stroke.slice(1)) {
                     tempContext.lineTo(pt.x, pt.y);
                 }
@@ -86,11 +88,12 @@ function saveCanvasAsImage(canvas, stroke_list) {
         a.download = `drawing_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
         a.click();
 
-        console.log('🎉 圖片已成功保存，包含筆劃記錄與拳頭標示！');
+        console.log('🎉 圖片已成功保存，包含筆劃記錄、大小、顏色與拳頭標示！');
     } catch (error) {
         console.error('❌ 保存圖片時發生錯誤:', error);
     }
 }
+
 
 
 /**
